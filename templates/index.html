@@ -1,0 +1,140 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chakel.css') }}">
+    <link rel="stylesheet" type="text/css" href="../static/chakel.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Food Recognition</title>
+</head>
+<!-- Add this script block at the end of your HTML file -->
+
+
+<body>
+    <header>
+        <ul class="navbar">
+            <ul class="sig">   
+               <a href="/" class="signin">EXIT</a></ul>
+    </header>
+<div class="left-container">
+    <div class="container1">
+        <div class="conn">
+        <div class="actionItemsContainer">
+            <!-- Your left container content... -->
+            <div class="actionItems flex-col gap-2">
+                <p class="login-text" style="font-size: 2rem; font-weight: 800;">Import image</p>
+                <div class="flex items-center justify-center w-full">
+                    <form method="post" enctype="multipart/form-data">
+                        <input type="file" name="file" accept=".jpg, .jpeg, .png, .gif">
+                    
+                </div>
+            </div>
+            
+            <div class="borderGradient" style="background-image: linear-gradient(104.61419021345674deg, var(--tw-gradient-stops));"></div>
+        </div>
+
+    </div>
+    <div class="btoun">
+
+    <input type="submit" value="Predict"></div>
+
+    </div>
+</form>
+</div>
+
+<div class="middle-container">
+    {% if image %}
+    <div class="container">
+        <h2>Results:</h2>
+        <img src="data:image/jpeg;base64,{{ image }}" alt="Predicted Image" style="max-width: 100%; height: auto;">
+    </div>
+</div>
+
+<div class="right-container">
+    <div class="container">
+        {% if boxes_info %}
+        <h3>Box Information:</h3>
+        <ul>
+            {% for box in boxes_info %}
+            <li>
+                <p><strong>Class:</strong> {{ box.label }}</p>
+                <!--<p><strong>Confidence:</strong> {{ box.confidence }}</p>
+                <p><strong>Coordinates:</strong> {{ box.coordinates }}</p> -->
+                
+                {% for entry in all_nutritional_values %}
+                    {% if entry.detected_class == box.label %}
+                    <div style="padding-left: 20px;">
+                        <h4>Nutritional Information:</h4>
+                        <p><strong>Protein:</strong> {{ entry.nutritional_values.Protein }}</p>
+                        <p><strong>Calories:</strong> {{ entry.nutritional_values.Calories }}</p>
+                        <p><strong>Fiber:</strong> {{ entry.nutritional_values.Fiber }}</p>
+                        <p><strong>Fat:</strong> {{ entry.nutritional_values.Fat }}</p>
+                        <p><strong>Carbs:</strong> {{ entry.nutritional_values.Carbs }}</p></div>
+                    {% endif %}
+                {% endfor %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+<div class="bottom-container">
+    <div class="e">
+        {% if total_nutritional_values %}
+        <h3>Total Nutritional Values:</h3>
+        <p><strong>Total Protein:</strong> {{ total_nutritional_values['Total Protein'] }}g</p>
+        <p><strong>Total Calories:</strong> {{ total_nutritional_values['Total Calories'] }}kcal</p>
+        <p><strong>Total Fiber:</strong> {{ total_nutritional_values['Total Fiber'] }}g</p>
+        <p><strong>Total Fat:</strong> {{ total_nutritional_values['Total Fat'] }}g</p>
+        <p><strong>Total Carbs:</strong> {{ total_nutritional_values['Total Carbs'] }}g</p>
+        
+    </div>
+
+    <div class="pie-chart-container">
+        <canvas id="pieChart" width="200" height="200"></canvas>
+    </div>
+    {% endif %}
+   
+</div>
+
+<script>
+    // Get the detected classes from Flask
+    var detectedClasses = ['Protein', 'Calories', 'Fiber', 'Fat', 'Carbs'];
+    var totalNutritionalValues = {
+        'Protein': {{ total_nutritional_values['Total Protein'] }},
+        'Calories': {{ total_nutritional_values['Total Calories'] }},
+        'Fat': {{ total_nutritional_values['Total Fat'] }},
+        'Fiber': {{ total_nutritional_values['Total Fiber'] }},
+        'Carbs': {{ total_nutritional_values['Total Carbs'] }}
+    };
+
+    // Create a data array for the pie chart
+    var data = {
+        labels: detectedClasses,
+        datasets: [{
+            data: Object.values(totalNutritionalValues),
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800', '#3333337a'], // Add more colors as needed
+        }]
+    };
+
+    // Get the canvas element
+    var ctx = document.getElementById('pieChart').getContext('2d');
+
+    // Create the pie chart
+    var myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: data,
+    options: {
+    plugins: {  
+      legend: {
+        position: 'right', // Set the position to left
+
+        labels: {
+          color: "white", 
+        }
+      }
+    }}
+});
+</script>
+{% endif %}
+</body>
+</html>
