@@ -1,4 +1,4 @@
-# NutriScan: 
+# NutriScan
 **Food Detection and Nutritional Analysis App**
 
 ## Overview
